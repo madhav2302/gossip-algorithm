@@ -13,14 +13,6 @@ defmodule Gossip.Worker do
      %{count: 0, neighbours: neighbours, worker_name: worker_name, scheduled_periodically: false}}
   end
 
-  def get_state(pid) do
-    GenServer.call(pid, :get_state)
-  end
-
-  def handle_call(:get_state, _from, state) do
-    {:reply, state, state}
-  end
-
   def handle_cast({:handle_rumor}, state) do
     if state.count == 0 do
       Gossip.State.init_worker(state.worker_name)
