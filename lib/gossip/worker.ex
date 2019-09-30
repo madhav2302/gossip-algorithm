@@ -21,12 +21,6 @@ defmodule Gossip.Worker do
     {:reply, state, state}
   end
 
-  def handle_cast({:delete_neighbour, worker_name}, state) do
-    updated_state = Map.put(state, :neighbours, state.neighbours -- [worker_name])
-    # IO.puts("New neighbours of #{state.worker_name} are #{inspect(state.neighbours)}")
-    {:noreply, updated_state}
-  end
-
   def handle_cast({:handle_rumor}, state) do
     if state.count == 0 do
       Gossip.State.init_worker(state.worker_name)
@@ -37,11 +31,6 @@ defmodule Gossip.Worker do
     cond do
       updated_state.count == @max_rumor_time ->
         Gossip.State.completed(updated_state.worker_name)
-
-        Enum.each(updated_state.neighbours, fn neighbour ->
-          GenServer.cast(neighbour, {:delete_neighbour, state.worker_name})
-        end)
-
         {:stop, :normal, updated_state}
 
       state.scheduled_periodically == false ->
