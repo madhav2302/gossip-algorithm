@@ -9,7 +9,7 @@ defmodule Main do
 
     Enum.each(1..num_nodes, fn node_number ->
       Gossip.Supervisor.add_node(node_number, num_nodes)
-      GenServer.cast(Gossip.Supervisor.worker_name(node_number), {:handle_rumor})
+      GenServer.cast(Gossip.Supervisor.worker_name(node_number), {:handle_rumor, "This is the rumor"})
     end)
 
     lets_wait()

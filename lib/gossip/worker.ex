@@ -13,12 +13,13 @@ defmodule Gossip.Worker do
      %{count: 0, neighbours: neighbours, worker_name: worker_name, scheduled_periodically: false}}
   end
 
-  def handle_cast({:handle_rumor}, state) do
+  def handle_cast({:handle_rumor, rumor}, state) do
     if state.count == 0 do
       Gossip.State.init_worker(state.worker_name)
     end
 
     updated_state = Map.put(state, :count, state.count + 1)
+    updated_state = Map.put(updated_state, :rumor, rumor)
 
     cond do
       updated_state.count == @max_rumor_time ->
@@ -44,7 +45,7 @@ defmodule Gossip.Worker do
       {:stop, :normal, state}
     else
       # IO.puts("Count of #{state.worker_name} is #{state.count}")
-      GenServer.cast(Enum.random(state.neighbours), {:handle_rumor})
+      GenServer.cast(Enum.random(state.neighbours), {:handle_rumor, state.rumor})
       Process.send_after(self(), {:scheduled_periodically}, @interval)
       {:noreply, state}
     end
