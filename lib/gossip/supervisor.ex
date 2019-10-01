@@ -16,21 +16,15 @@ defmodule Gossip.Supervisor do
     })
   end
 
-  def add_node(node_number, total_nodes) do
+  def add_node(node_number, neighbors) do
     DynamicSupervisor.start_child(:supervisor_for_node, %{
       id: node_number,
       restart: :transient,
-      start:
-        {Gossip.Worker, :start_link,
-         [worker_name(node_number), neighbours(node_number, total_nodes)]}
+      start: {Gossip.Worker, :start_link, [worker_name(node_number), neighbors]}
     })
   end
 
   def worker_name(node_number) do
     :"worker_#{node_number}"
-  end
-
-  def neighbours(node_number, total_nodes) do
-    Enum.map(Enum.filter(1..total_nodes, fn current -> node_number != current end), &worker_name/1)
   end
 end

@@ -1,14 +1,18 @@
 # return the neighbours as per the selected topology
 defmodule Topology do
-  def getNeighbours(topology, numNode, num) do
+  def getNeighbours(topology, numNode) do
     case topology do
       "full" -> fullTopology(numNode)
       "line" -> lineTopology(numNode)
       "rand2D" -> rand2DTopology(numNode)
-      "3Dtorus" -> threeDtorusTopology(numNode, num)
+      "3Dtorus" -> threeDtorusTopology(numNode)
       "honeycomb" -> honeycombTopology(numNode)
       "randhoneycomb" -> randhoneycombTopology(numNode)
     end
+  end
+
+  def worker_name(node_number) do
+    :"worker_#{node_number}"
   end
 
   def fullTopology(numNode) do
@@ -16,7 +20,7 @@ defmodule Topology do
       neighbours =
         cond do
           # return all nodes except the current one
-          true -> Enum.to_list(1..numNode) -- [i]
+          true -> Enum.map(Enum.to_list(1..numNode) -- [i], &worker_name/1)
         end
 
       neighbours
@@ -28,11 +32,11 @@ defmodule Topology do
       neighbours =
         cond do
           # single neighbour for first node in the list
-          i == 1 -> [Integer.to_string(i + 1)]
+          i == 1 -> [worker_name(i + 1)]
           # single neighbour for the last node in the list
-          i == numNode -> [Integer.to_string(i - 1)]
+          i == numNode -> [worker_name(i - 1)]
           # else , return previous node and next node
-          true -> [Integer.to_string(i - 1), Integer.to_string(i + 1)]
+          true -> [worker_name(i - 1), worker_name(i + 1)]
         end
 
       neighbours
@@ -85,40 +89,44 @@ defmodule Topology do
     end
   end
 
-  def threeDtorusTopology(numNodes, num) do
+  def threeDtorusTopology(numNodes) do
     # cube root of numNodes
     n = round(:math.pow(numNodes, 1 / 3))
     nsquared = n * n
-    [x, y, z] = find_coordinates(num, n)
 
-    xList =
-      cond do
-        x == 1 -> [num + 1, num + n - 1]
-        x == n -> [num - 1, num - n + 1]
-        true -> [num - 1, num + 1]
-      end
+    Enum.map(1..numNodes, fn num ->
+      [x, y, z] = find_coordinates(num, n)
 
-    yList =
-      cond do
-        y == 1 -> [num + n, num + n * (n - 1)]
-        y == n -> [num - n, num - n * (n - 1)]
-        true -> [num + n, num - n]
-      end
+      xList =
+        cond do
+          x == 1 -> [num + 1, num + n - 1]
+          x == n -> [num - 1, num - n + 1]
+          true -> [num - 1, num + 1]
+        end
 
-    zList =
-      cond do
-        z == 1 -> [num + nsquared, num + nsquared * (n - 1)]
-        z == n -> [num - nsquared, nsquared * (n + 1)-num]
-        true -> [num - nsquared, num + nsquared]
-      end
+      yList =
+        cond do
+          y == 1 -> [num + n, num + n * (n - 1)]
+          y == n -> [num - n, num - n * (n - 1)]
+          true -> [num + n, num - n]
+        end
 
-    xList ++ yList ++ zList
+      zList =
+        cond do
+          z == 1 -> [num + nsquared, num + nsquared * (n - 1)]
+          z == n -> [num - nsquared, nsquared * (n + 1) - num]
+          true -> [num - nsquared, num + nsquared]
+        end
+
+      Enum.map(xList ++ yList ++ zList, &worker_name/1)
+    end)
   end
 
   def find_coordinates(x, n) do
     nSquared = n * n
     remZ = rem(x, nSquared)
     z = div(x, nSquared)
+
     if remZ != 0 do
       z = z + 1
       y = div(remZ, n)

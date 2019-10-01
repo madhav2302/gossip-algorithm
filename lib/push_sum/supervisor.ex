@@ -16,13 +16,13 @@ defmodule PushSum.Supervisor do
     })
   end
 
-  def add_node(node_number, total_nodes) do
+  def add_node(node_number, neighbors) do
     DynamicSupervisor.start_child(:supervisor_for_node, %{
       id: node_number,
       restart: :transient,
       start:
         {PushSum.Worker, :start_link,
-         [worker_name(node_number), neighbours(node_number, total_nodes)]}
+         [worker_name(node_number), node_number, neighbors]}
     })
   end
 

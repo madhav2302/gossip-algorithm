@@ -13,6 +13,11 @@ defmodule Gossip.State do
     GenServer.call(__MODULE__, :get_state, :infinity)
   end
 
+  def initialized_length() do
+    state = get_state()
+    state.initialized |> length()
+  end
+
   def everyone_completed() do
     state = get_state()
 

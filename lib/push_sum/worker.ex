@@ -27,6 +27,8 @@ defmodule PushSum.Worker do
         PushSum.State.init_worker(state.worker_name)
         Process.send_after(self(), {:scheduled_periodically}, @interval)
         Map.put(state, :scheduled_periodically, true)
+      else
+        state
       end
 
     s = state.s + s_from
@@ -39,7 +41,7 @@ defmodule PushSum.Worker do
 
     {changes, stop} =
       if(ratio_diff < @actor_ratio_threshold && state.changes == 2) do
-        PushSum.State.completed(state.worker_name)
+        PushSum.State.completed(state.worker_name, ratio_new)
         {state.changes, true}
       else
         if(ratio_diff < @actor_ratio_threshold) do
@@ -49,28 +51,35 @@ defmodule PushSum.Worker do
         end
       end
 
-    updated_state = Map.put(state, :s, s_new)
-    updated_state = Map.put(updated_state, :w, w_new)
-    updated_state = Map.put(updated_state, :ratio, ratio_new)
-    updated_state = Map.put(updated_state, :changes, changes)
+    state = Map.put(state, :s, s_new)
+    state = Map.put(state, :w, w_new)
+    state = Map.put(state, :ratio, ratio_new)
+    state = Map.put(state, :changes, changes)
 
     if stop do
-      {:stop, :normal, updated_state}
+      {:stop, :normal, state}
     else
-      {:noreply, updated_state}
+      {:noreply, state}
     end
   end
 
   def handle_info({:scheduled_periodically}, state) do
+    # IO.inspect state
     terminated_workers = PushSum.State.terminated_workers()
     state = Map.put(state, :neighbours, state.neighbours -- terminated_workers)
 
+    s_new = state.s / 2
+    w_new = state.w / 2
+
+    state = Map.put(state, :s, s_new)
+    state = Map.put(state, :w, w_new)
+
     if state.neighbours |> length() == 0 do
-      PushSum.State.no_more_neighbours(state.worker_name)
+      PushSum.State.no_more_neighbours(state.worker_name, state.ratio)
       {:stop, :normal, state}
     else
       # IO.puts("Count of #{state.worker_name} is #{state.count}")
-      GenServer.cast(Enum.random(state.neighbours), {:push_sum, state.rumor})
+      GenServer.cast(Enum.random(state.neighbours), {:push_sum, state.s, state.w})
       Process.send_after(self(), {:scheduled_periodically}, @interval)
       {:noreply, state}
     end
