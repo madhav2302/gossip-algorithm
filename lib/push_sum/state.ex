@@ -6,6 +6,7 @@ defmodule PushSum.State do
   end
 
   def init([]) do
+    # send(self(), {:print_state_length})
     {:ok, %{initialized: [], completed: [], no_more_neighbours: []}}
   end
 
@@ -69,5 +70,20 @@ defmodule PushSum.State do
   def handle_cast({:no_more_neighbour, worker_name}, state) do
     updated_state = Map.put(state, :no_more_neighbours, state.no_more_neighbours ++ [worker_name])
     {:noreply, updated_state}
+  end
+
+  def handle_info({:print_state_length}, state) do
+    # IO.puts(
+    #   "Completed #{state.completed |> length()}, Initialized #{state.initialized |> length()}, no more neighbors #{
+    #     state.no_more_neighbours |> length()
+    #   }"
+    # )
+
+    IO.puts "Length is #{(state.initialized -- (state.completed ++ state.no_more_neighbours)) |> length}"
+    # IO.inspect (state.initialized -- (state.completed ++ state.no_more_neighbours))
+
+    Process.send_after(self(), {:print_state_length}, 1)
+
+    {:noreply, state}
   end
 end

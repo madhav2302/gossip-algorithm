@@ -13,9 +13,7 @@ defmodule Main do
 
     neighbors = Topology.getNeighbours(topology, num_nodes)
 
-    # IO.inspect neighbors
-
-    # IO.puts "Started things"
+    IO.puts("Neighbours Initialized, Now Starting Gossip/PushSum")
 
     if algorithm == "gossip" do
       gossip(num_nodes, neighbors)
@@ -33,7 +31,10 @@ defmodule Main do
     start_time = System.monotonic_time(:millisecond)
 
     Enum.each(1..num_nodes, fn node_number ->
-      Gossip.Supervisor.add_node(node_number, Enum.at(neighbors, node_number - 1))
+      Gossip.Supervisor.add_node(
+        node_number,
+        Enum.at(neighbors, node_number - 1) -- [Gossip.Supervisor.worker_name(num_nodes + 1)]
+      )
     end)
 
     GenServer.cast(
@@ -60,7 +61,7 @@ defmodule Main do
     PushSum.Supervisor.start_state_server()
 
     Enum.each(1..num_nodes, fn node_number ->
-      PushSum.Supervisor.add_node(node_number, Enum.at(neighbors, node_number - 1))
+      PushSum.Supervisor.add_node(node_number, Enum.at(neighbors, node_number - 1) -- [PushSum.Supervisor.worker_name(num_nodes + 1)])
     end)
 
     start_time = System.monotonic_time(:millisecond)
@@ -70,7 +71,7 @@ defmodule Main do
     lets_wait(&PushSum.State.everyone_completed/0)
     end_time = System.monotonic_time(:millisecond)
 
-    IO.inspect(DynamicSupervisor.which_children(:supervisor_for_node) |> length())
+    # IO.inspect(DynamicSupervisor.which_children(:supervisor_for_node) |> length())
 
     state = PushSum.State.get_state()
 
