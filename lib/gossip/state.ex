@@ -10,13 +10,17 @@ defmodule Gossip.State do
   end
 
   def get_state() do
-    GenServer.call(__MODULE__, :get_state)
+    GenServer.call(__MODULE__, :get_state, :infinity)
   end
 
   def everyone_completed() do
     state = get_state()
 
-    (state.initialized -- (state.completed ++ state.no_more_neighbours)) |> length == 0
+    if state.initialized == [] do
+      false
+    else
+      (state.initialized -- (state.completed ++ state.no_more_neighbours)) |> length == 0
+    end
   end
 
   def terminated_workers() do
@@ -28,7 +32,7 @@ defmodule Gossip.State do
   #### State manipulation mathods ####
   def init_worker(worker_name) do
     # IO.puts("#{worker_name} initialized")
-    GenServer.call(__MODULE__, {:init, worker_name})
+    GenServer.cast(__MODULE__, {:init, worker_name})
   end
 
   def completed(worker_name) do
@@ -46,9 +50,9 @@ defmodule Gossip.State do
     {:reply, state, state}
   end
 
-  def handle_call({:init, worker_name}, _from, state) do
+  def handle_cast({:init, worker_name}, state) do
     updated_state = Map.put(state, :initialized, state.initialized ++ [worker_name])
-    {:reply, updated_state, updated_state}
+    {:noreply, updated_state}
   end
 
   def handle_cast({:completed, worker_name}, state) do

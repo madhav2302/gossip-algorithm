@@ -9,12 +9,14 @@ defmodule Main do
 
     Enum.each(1..num_nodes, fn node_number ->
       Gossip.Supervisor.add_node(node_number, num_nodes)
-      GenServer.cast(Gossip.Supervisor.worker_name(node_number), {:handle_rumor, "This is the rumor"})
     end)
+
+    GenServer.cast(Gossip.Supervisor.worker_name(div(num_nodes, 2)), {:handle_rumor, "This is the rumor"})
 
     lets_wait()
     end_time = System.monotonic_time(:millisecond)
 
+    IO.inspect DynamicSupervisor.which_children(:supervisor_for_node) |> length()
     IO.puts("Convergence Time is #{end_time - start_time}")
 
     {:ok, self()}
