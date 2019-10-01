@@ -9,11 +9,13 @@ defmodule Main do
         num_nodes
       end
 
-    IO.puts("#{num_nodes} #{topology} #{algorithm}")
+    # IO.puts("#{num_nodes} #{topology} #{algorithm}")
+
     neighbors = Topology.getNeighbours(topology, num_nodes)
+
     # IO.inspect neighbors
 
-    IO.puts "Started things"
+    # IO.puts "Started things"
 
     if algorithm == "gossip" do
       gossip(num_nodes, neighbors)

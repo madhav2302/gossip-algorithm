@@ -40,14 +40,13 @@ defmodule PushSum.State do
     GenServer.call(__MODULE__, {:init, worker_name})
   end
 
-  def completed(worker_name, ratio) do
-    # IO.puts("#{worker_name} completed")
-    IO.puts "Ratio from #{worker_name} is #{ratio} with completed"
+  def completed(worker_name, _ratio) do
+    # IO.puts "Ratio from #{worker_name} is #{ratio} with completed"
     GenServer.cast(__MODULE__, {:completed, worker_name})
   end
 
-  def no_more_neighbours(worker_name, ratio) do
-    IO.puts "Ratio fro #{worker_name} is #{ratio} with no neighbour"
+  def no_more_neighbours(worker_name, _ratio) do
+    # IO.puts "Ratio for #{worker_name} is #{ratio} with no neighbour"
     # IO.puts("#{worker_name} no neighbours left")
     GenServer.cast(__MODULE__, {:no_more_neighbour, worker_name})
   end

@@ -31,10 +31,8 @@ defmodule PushSum.Worker do
         state
       end
 
-    s = state.s + s_from
-    w = state.w + w_from
-    s_new = s / 2
-    w_new = w / 2
+    s_new = state.s + s_from
+    w_new = state.w + w_from
     ratio_new = s_new / w_new
     ratio_diff = ratio_new - state.ratio
     ratio_diff = abs(ratio_diff)
@@ -68,11 +66,8 @@ defmodule PushSum.Worker do
     terminated_workers = PushSum.State.terminated_workers()
     state = Map.put(state, :neighbours, state.neighbours -- terminated_workers)
 
-    s_new = state.s / 2
-    w_new = state.w / 2
-
-    state = Map.put(state, :s, s_new)
-    state = Map.put(state, :w, w_new)
+    state = Map.put(state, :s, state.s / 2)
+    state = Map.put(state, :w, state.w / 2)
 
     if state.neighbours |> length() == 0 do
       PushSum.State.no_more_neighbours(state.worker_name, state.ratio)

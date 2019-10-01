@@ -71,7 +71,7 @@ defmodule Topology do
 
       l = Enum.filter(l, &(!is_nil(&1)))
       l = l -- [key1]
-      l2 ++ [l]
+      l2 ++ [Enum.map(l, &worker_name/1)]
     end)
   end
 
