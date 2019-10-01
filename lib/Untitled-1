@@ -1,0 +1,78 @@
+Gossip with 1000 nodes
+
+full - Convergence Time is 622 with workers ran 1000 with percentage 99.9
+line - Convergence Time is 1413 with workers ran 1000 with percentage 62.7
+rand2D - Convergence Time is 156 with workers ran 1000 with percentage 98.3
+3Dtorus - Convergence Time is 140 with workers ran 1000 with percentage 83.89999999999999
+honeycomb - 
+randhoneycomb - 
+
+Gossip with 2000 nodes
+
+full - Convergence Time is 2802 with workers ran 2000 with percentage 100.0
+line - Convergence Time is 2605 with workers ran 2000 with percentage 64.0
+rand2D - Convergence Time is 580 with workers ran 2000 with percentage 99.3
+3Dtorus - Convergence Time is 472 with workers ran 2197 with percentage 82.43058716431497
+
+Gossip with 3000 nodes
+
+full - Convergence Time is 6654 with workers ran 3000 with percentage 99.96666666666667
+line - Convergence Time is 3499 with workers ran 3000 with percentage 64.06666666666668
+rand2D - Convergence Time is 1397 with workers ran 3000 with percentage 99.53333333333333
+3Dtorus - Convergence Time is 991 with workers ran 3375 with percentage 84.14814814814815
+
+Gossip with 4000 nodes
+
+full - Convergence Time is 12292 with workers ran 4000 with percentage 99.97500000000001
+line - Convergence Time is 4690 with workers ran 4000 with percentage 63.175000000000004
+randf2D - Convergence Time is 2574 with workers ran 4000 with percentage 99.5
+3Dtorus - Convergence Time is 1559 with workers ran 4096 with percentage 84.1552734375
+
+Gossip with 5000 nodes
+
+full - Convergence Time is 20161 with workers ran 5000 with percentage 100.0
+line - Convergence Time is 6212 with workers ran 3347 with percentage 42.559999999999995
+rand2D - Convergence Time is 4380 with workers ran 5000 with percentage 99.66000000000001
+3Dtorus - Convergence Time is 3224 with workers ran 5832 with percentage 83.31618655692729
+
+Push-sum with 1000 nodes
+
+full - Convergence Time is 6187 with workers ran 1000 with percentage 99.9
+line - Convergence Time is 1079 with workers ran 750 with percentage 45.2
+rand2D - Convergence Time is 12354 with workers ran 1000 with percentage 98.0
+3Dtorus - Convergence Time is 5908 with workers ran 1000 with percentage 70.39999999999999
+honeycomb - 
+randhoneycomb - 
+
+Push-sum with 2000
+
+full - Convergence Time is 26534 with workers ran 2000 with percentage 99.95
+line - Convergence Time is 685 with workers ran 368 with percentage 10.7
+rand2D - Convergence Time is 58543 with workers ran 2000 with percentage 99.05000000000001
+3Dtorus - Convergence Time is 44195 with workers ran 2197 with percentage 68.59353664087392
+
+
+Push-sum with 3000
+
+full - Convergence Time is 64255 with workers ran 3000 with percentage 99.96666666666667
+line - Convergence Time is 3808 with workers ran 2087 with percentage 42.53333333333333
+rand2D - Convergence Time is 153979 with workers ran 3000 with percentage 99.46666666666667
+3Dtorus - Convergence Time is 214852 with workers ran 3375 with percentage 66.48888888888888
+
+Gossip with 10000 nodes
+
+full - Convergence Time is 92900 with workers ran 10000 with percentage 99.99
+line - Convergence Time is 13303 with workers ran 10000 with percentage 63.129999999999995
+rand2D - Convergence Time is 21948 with workers ran 10000 with percentage 99.81
+3Dtorus - Convergence Time is 10306 with workers ran 10648 with percentage 83.68707738542449
+honeycomb - 
+randhoneycomb -
+
+Push sum with 10000 nodes
+
+full -
+line - 
+rand2D - 
+3Dtorus - 
+honeycomb - 
+randhoneycomb - 

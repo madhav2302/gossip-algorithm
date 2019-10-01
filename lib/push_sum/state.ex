@@ -11,7 +11,7 @@ defmodule PushSum.State do
   end
 
   def get_state() do
-    GenServer.call(__MODULE__, :get_state)
+    GenServer.call(__MODULE__, :get_state, :infinity)
   end
 
   def initialized_length() do
@@ -38,7 +38,7 @@ defmodule PushSum.State do
   #### State manipulation mathods ####
   def init_worker(worker_name) do
     # IO.puts("#{worker_name} initialized")
-    GenServer.call(__MODULE__, {:init, worker_name})
+    GenServer.call(__MODULE__, {:init, worker_name}, :infinity)
   end
 
   def completed(worker_name, _ratio) do
