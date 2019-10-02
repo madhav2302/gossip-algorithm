@@ -72,6 +72,8 @@ defmodule PushSum.Worker do
     end)
 
     state = Map.put(state, :neighbours, neighbours)
+    state = Map.put(state, :s, state.s / 2)
+    state = Map.put(state, :w, state.w / 2)
 
     if state.neighbours |> length() == 0 do
       PushSum.State.no_more_neighbours(state.worker_name, state.ratio)
