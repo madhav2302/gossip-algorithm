@@ -14,11 +14,6 @@ defmodule PushSum.State do
     GenServer.call(__MODULE__, :get_state, :infinity)
   end
 
-  def initialized_length() do
-    state = get_state()
-    state.initialized |> length()
-  end
-
   def everyone_completed() do
     state = get_state()
 
@@ -27,12 +22,6 @@ defmodule PushSum.State do
     else
       (state.initialized -- (state.completed ++ state.no_more_neighbours)) |> length == 0
     end
-  end
-
-  def terminated_workers() do
-    state = get_state()
-
-    state.completed ++ state.no_more_neighbours
   end
 
   #### State manipulation mathods ####
@@ -79,7 +68,10 @@ defmodule PushSum.State do
     #   }"
     # )
 
-    IO.puts "Length is #{(state.initialized -- (state.completed ++ state.no_more_neighbours)) |> length}"
+    IO.puts(
+      "Length is #{(state.initialized -- (state.completed ++ state.no_more_neighbours)) |> length}"
+    )
+
     # IO.inspect (state.initialized -- (state.completed ++ state.no_more_neighbours))
 
     Process.send_after(self(), {:print_state_length}, 1)

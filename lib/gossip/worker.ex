@@ -37,8 +37,16 @@ defmodule Gossip.Worker do
   end
 
   def handle_info({:scheduled_periodically}, state) do
-    terminated_workers = Gossip.State.terminated_workers()
-    state = Map.put(state, :neighbours, state.neighbours -- terminated_workers)
+    neighbours = Enum.filter(state.neighbours, fn n ->
+      pid = Process.whereis(n)
+      if (pid == nil) do
+        false
+      else
+        Process.alive?(pid)
+      end
+    end)
+
+    state = Map.put(state, :neighbours, neighbours)
 
     if state.neighbours |> length() == 0 do
       Gossip.State.no_more_neighbours(state.worker_name)

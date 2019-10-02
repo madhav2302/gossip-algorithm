@@ -38,7 +38,7 @@ defmodule Main do
     end)
 
     GenServer.cast(
-      Gossip.Supervisor.worker_name(div(num_nodes, 2) + 1),
+      Gossip.Supervisor.worker_name(1),
       {:handle_rumor, "This is the rumor"}
     )
 
@@ -66,7 +66,7 @@ defmodule Main do
 
     start_time = System.monotonic_time(:millisecond)
 
-    GenServer.cast(PushSum.Supervisor.worker_name(div(num_nodes, 2) + 1), {:push_sum, 0, 0})
+    GenServer.cast(PushSum.Supervisor.worker_name(1), {:push_sum, 0, 0})
 
     lets_wait(&PushSum.State.everyone_completed/0)
     end_time = System.monotonic_time(:millisecond)

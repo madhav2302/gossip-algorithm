@@ -62,12 +62,16 @@ defmodule PushSum.Worker do
   end
 
   def handle_info({:scheduled_periodically}, state) do
-    # IO.inspect state
-    terminated_workers = PushSum.State.terminated_workers()
-    state = Map.put(state, :neighbours, state.neighbours -- terminated_workers)
+    neighbours = Enum.filter(state.neighbours, fn n ->
+      pid = Process.whereis(n)
+      if (pid == nil) do
+        false
+      else
+        Process.alive?(pid)
+      end
+    end)
 
-    state = Map.put(state, :s, state.s / 2)
-    state = Map.put(state, :w, state.w / 2)
+    state = Map.put(state, :neighbours, neighbours)
 
     if state.neighbours |> length() == 0 do
       PushSum.State.no_more_neighbours(state.worker_name, state.ratio)
