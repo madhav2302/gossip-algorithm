@@ -11,16 +11,14 @@ defmodule Topology do
     end
   end
 
-  def worker_name(node_number) do
-    :"worker_#{node_number}"
-  end
-
   def fullTopology(numNode) do
+    workerNames = Enum.map(1..numNode, &w/1)
+
     for i <- 1..numNode do
       neighbours =
         cond do
           # return all nodes except the current one
-          true -> Enum.map(Enum.to_list(1..numNode) -- [i], &worker_name/1)
+          true -> workerNames -- [w(i)]
         end
 
       neighbours
@@ -32,11 +30,11 @@ defmodule Topology do
       neighbours =
         cond do
           # single neighbour for first node in the list
-          i == 1 -> [worker_name(i + 1)]
+          i == 1 -> [w(i + 1)]
           # single neighbour for the last node in the list
-          i == numNode -> [worker_name(i - 1)]
+          i == numNode -> [w(i - 1)]
           # else , return previous node and next node
-          true -> [worker_name(i - 1), worker_name(i + 1)]
+          true -> [w(i - 1), w(i + 1)]
         end
 
       neighbours
@@ -71,7 +69,7 @@ defmodule Topology do
 
       l = Enum.filter(l, &(!is_nil(&1)))
       l = l -- [key1]
-      l2 ++ [Enum.map(l, &worker_name/1)]
+      l2 ++ [Enum.map(l, &w/1)]
     end)
   end
 
@@ -118,7 +116,7 @@ defmodule Topology do
           true -> [num - nsquared, num + nsquared]
         end
 
-      Enum.map(xList ++ yList ++ zList, &worker_name/1)
+      Enum.map(xList ++ yList ++ zList, &w/1)
     end)
   end
 
@@ -141,20 +139,6 @@ defmodule Topology do
       end
     else
       [n, n, z]
-    end
-  end
-
-  def validate_neighbour(x, y, rows, cols, n) do
-    if x >= 0 && x <= rows - 1 && y > 0 && y <= cols do
-      next = x * cols + y
-
-      if(next <= n) do
-        ["#{next}"]
-      else
-        []
-      end
-    else
-      []
     end
   end
 

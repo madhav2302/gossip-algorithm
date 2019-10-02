@@ -1,4 +1,4 @@
-defmodule PushSum.Worker do
+defmodule PushSumWorker do
   use GenServer
 
   @interval 0
@@ -24,7 +24,7 @@ defmodule PushSum.Worker do
   def handle_cast({:push_sum, s_from, w_from}, state) do
     state =
       if state.scheduled_periodically == false do
-        PushSum.State.init_worker(state.worker_name)
+        State.init_worker(state.worker_name)
         Process.send_after(self(), {:scheduled_periodically}, @interval)
         Map.put(state, :scheduled_periodically, true)
       else
@@ -39,7 +39,7 @@ defmodule PushSum.Worker do
 
     {changes, stop} =
       if(ratio_diff < @actor_ratio_threshold && state.changes == 2) do
-        PushSum.State.completed(state.worker_name, ratio_new)
+        State.completed(state.worker_name)
         {state.changes, true}
       else
         if(ratio_diff < @actor_ratio_threshold) do
@@ -76,7 +76,7 @@ defmodule PushSum.Worker do
     state = Map.put(state, :w, state.w / 2)
 
     if state.neighbours |> length() == 0 do
-      PushSum.State.no_more_neighbours(state.worker_name, state.ratio)
+      State.no_more_neighbours(state.worker_name)
       {:stop, :normal, state}
     else
       # IO.puts("Count of #{state.worker_name} is #{state.count}")

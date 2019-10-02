@@ -15,39 +15,44 @@ defmodule Main do
 
     IO.puts("Neighbours Initialized, Now Starting Gossip/PushSum")
 
-    if algorithm == "gossip" do
-      gossip(num_nodes, neighbors)
-    else
-      push_sum(num_nodes, neighbors)
+    cond do
+      algorithm == "gossip" ->
+        gossip(num_nodes, neighbors)
+
+      algorithm == "push-sum" ->
+        push_sum(num_nodes, neighbors)
+
+      true ->
+        IO.puts("Invalid algorithm")
     end
 
     {:ok, self()}
   end
 
   defp gossip(num_nodes, neighbors) do
-    Gossip.Supervisor.start_link()
-    Gossip.Supervisor.start_state_server()
+    ProjSupervisor.start_link()
+    ProjSupervisor.start_state_server()
 
     start_time = System.monotonic_time(:millisecond)
 
     Enum.each(1..num_nodes, fn node_number ->
-      Gossip.Supervisor.add_node(
+      ProjSupervisor.add_gossip_node(
         node_number,
-        Enum.at(neighbors, node_number - 1) -- [Gossip.Supervisor.worker_name(num_nodes + 1)]
+        Enum.at(neighbors, node_number - 1) -- [ProjSupervisor.worker_name(num_nodes + 1)]
       )
     end)
 
     GenServer.cast(
-      Gossip.Supervisor.worker_name(1),
+      ProjSupervisor.worker_name(1),
       {:handle_rumor, "This is the rumor"}
     )
 
-    lets_wait(&Gossip.State.everyone_completed/0)
+    lets_wait(&State.everyone_completed/0)
     end_time = System.monotonic_time(:millisecond)
 
-    IO.inspect(DynamicSupervisor.which_children(:supervisor_for_node) |> length())
+    # IO.inspect(DynamicSupervisor.which_children(:supervisor_for_node) |> length())
 
-    state = Gossip.State.get_state()
+    state = State.get_state()
 
     IO.puts(
       "Convergence Time is #{end_time - start_time} with workers ran #{
@@ -57,23 +62,26 @@ defmodule Main do
   end
 
   defp push_sum(num_nodes, neighbors) do
-    PushSum.Supervisor.start_link()
-    PushSum.Supervisor.start_state_server()
+    ProjSupervisor.start_link()
+    ProjSupervisor.start_state_server()
 
     Enum.each(1..num_nodes, fn node_number ->
-      PushSum.Supervisor.add_node(node_number, Enum.at(neighbors, node_number - 1) -- [PushSum.Supervisor.worker_name(num_nodes + 1)])
+      ProjSupervisor.add_push_sum_node(
+        node_number,
+        Enum.at(neighbors, node_number - 1) -- [ProjSupervisor.worker_name(num_nodes + 1)]
+      )
     end)
 
     start_time = System.monotonic_time(:millisecond)
 
-    GenServer.cast(PushSum.Supervisor.worker_name(1), {:push_sum, 0, 0})
+    GenServer.cast(ProjSupervisor.worker_name(1), {:push_sum, 0, 0})
 
-    lets_wait(&PushSum.State.everyone_completed/0)
+    lets_wait(&State.everyone_completed/0)
     end_time = System.monotonic_time(:millisecond)
 
     # IO.inspect(DynamicSupervisor.which_children(:supervisor_for_node) |> length())
 
-    state = PushSum.State.get_state()
+    state = State.get_state()
 
     IO.puts(
       "Convergence Time is #{end_time - start_time} with workers ran #{

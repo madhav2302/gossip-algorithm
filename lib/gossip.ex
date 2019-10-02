@@ -1,8 +1,8 @@
-defmodule Gossip.Worker do
+defmodule GossipWorker do
   use GenServer
 
   @interval 0
-  @max_rumor_time 10
+  @max_rumor_count 10
 
   def start_link(worker_name, neighbours) do
     GenServer.start_link(__MODULE__, [worker_name, neighbours], name: worker_name)
@@ -15,15 +15,15 @@ defmodule Gossip.Worker do
 
   def handle_cast({:handle_rumor, rumor}, state) do
     if state.count == 0 do
-      Gossip.State.init_worker(state.worker_name)
+      State.init_worker(state.worker_name)
     end
 
     updated_state = Map.put(state, :count, state.count + 1)
     updated_state = Map.put(updated_state, :rumor, rumor)
 
     cond do
-      updated_state.count == @max_rumor_time ->
-        Gossip.State.completed(updated_state.worker_name)
+      updated_state.count == @max_rumor_count ->
+        State.completed(updated_state.worker_name)
         {:stop, :normal, updated_state}
 
       state.scheduled_periodically == false ->
@@ -49,7 +49,7 @@ defmodule Gossip.Worker do
     state = Map.put(state, :neighbours, neighbours)
 
     if state.neighbours |> length() == 0 do
-      Gossip.State.no_more_neighbours(state.worker_name)
+      State.no_more_neighbours(state.worker_name)
       {:stop, :normal, state}
     else
       # IO.puts("Count of #{state.worker_name} is #{state.count}")
