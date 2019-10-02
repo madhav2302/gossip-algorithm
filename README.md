@@ -6,13 +6,14 @@
 
 --- 
 
-### Steps to run the Project:
+### Steps to run the project:
+   `mix escript.build`
    `./my_program <number of nodes> <topology> <algorithm>`
-   
 
-### Number of Actors
- 
-Number of actors will be determined by the input to the program.
+
+### What is working?   
+
+For both gossip and push-sum algorithm, all 6 topologies i.e. Full, Line, Random 2D, 3D torus, Honeycomb and Random Honeycomb networkds are working.
  
 ---
 
@@ -27,14 +28,15 @@ Convergence Time is 658 with workers ran 320 with percentage 37.6
 
 
 --- 
-#### Largest Network - 10000 Nodes for Gossip 
+#### Largest Network
 
-
-```text
-full - Convergence Time is 92900 with workers ran 10000 with percentage 99.99
-line - Convergence Time is 13303 with workers ran 10000 with percentage 63.129999999999995
-rand2D - Convergence Time is 21948 with workers ran 10000 with percentage 99.81
-3Dtorus - Convergence Time is 10306 with workers ran 10648 with percentage 83.68707738542449
-```
+| Largest Network  | Gossip | PushSum |
+|------------------|--------|---------|
+| Full             | 15,000 | 1,500   |
+| Line             | 10,000 | 1,000   |
+| Rand2D           | 10,000 | 3,000   |
+| 3D-Torus         | 20,000 | 5,000   |
+| Honeycomb        | 20,000 | 10,000  |
+| Random Honeycomb | 15,000 | 20,000  |
 
 
