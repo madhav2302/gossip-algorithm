@@ -13,6 +13,10 @@ defmodule GossipWorker do
      %{count: 0, neighbours: neighbours, worker_name: worker_name, scheduled_periodically: false}}
   end
 
+  def handle_call({:fail_the_node}, _from, state) do
+    {:stop, :normal, state, state}
+  end
+
   def handle_cast({:handle_rumor, rumor}, state) do
     if state.count == 0 do
       State.init_worker(state.worker_name)

@@ -1,6 +1,8 @@
 defmodule Main do
-  def main([num_nodes_string, topology, algorithm]) do
+  def main([num_nodes_string, topology, algorithm, failure_string]) do
     num_nodes = String.to_integer(num_nodes_string)
+    failure = String.to_integer(failure_string)
+    fail_nodes = trunc(failure * num_nodes * 0.01)
 
     num_nodes =
       if topology == "3Dtorus" do
@@ -17,10 +19,10 @@ defmodule Main do
 
     cond do
       algorithm == "gossip" ->
-        gossip(num_nodes, neighbors)
+        gossip(num_nodes, neighbors, fail_nodes)
 
       algorithm == "push-sum" ->
-        push_sum(num_nodes, neighbors)
+        push_sum(num_nodes, neighbors, fail_nodes)
 
       true ->
         IO.puts("Invalid algorithm")
@@ -29,11 +31,9 @@ defmodule Main do
     {:ok, self()}
   end
 
-  defp gossip(num_nodes, neighbors) do
+  defp gossip(num_nodes, neighbors, fail_nodes) do
     ProjSupervisor.start_link()
     ProjSupervisor.start_state_server()
-
-    start_time = System.monotonic_time(:millisecond)
 
     Enum.each(1..num_nodes, fn node_number ->
       ProjSupervisor.add_gossip_node(
@@ -42,8 +42,15 @@ defmodule Main do
       )
     end)
 
+    failed_nodes = Enum.map(Enum.take_random(1..num_nodes, fail_nodes), fn n ->
+      GenServer.call(ProjSupervisor.worker_name(n), {:fail_the_node})
+      n
+    end)
+
+    start_time = System.monotonic_time(:millisecond)
+
     GenServer.cast(
-      ProjSupervisor.worker_name(1),
+      ProjSupervisor.worker_name(Enum.random(Enum.to_list(1..num_nodes) -- failed_nodes)),
       {:handle_rumor, "This is the rumor"}
     )
 
@@ -61,7 +68,7 @@ defmodule Main do
     )
   end
 
-  defp push_sum(num_nodes, neighbors) do
+  defp push_sum(num_nodes, neighbors, fail_nodes) do
     ProjSupervisor.start_link()
     ProjSupervisor.start_state_server()
 
@@ -72,9 +79,14 @@ defmodule Main do
       )
     end)
 
+    failed_nodes = Enum.map(Enum.take_random(num_nodes, fail_nodes), fn n ->
+      GenServer.call(ProjSupervisor.worker_name(n), {:fail_the_node})
+      n
+    end)
+
     start_time = System.monotonic_time(:millisecond)
 
-    GenServer.cast(ProjSupervisor.worker_name(1), {:push_sum, 0, 0})
+    GenServer.cast(ProjSupervisor.worker_name(Enum.random(Enum.to_list(num_nodes) -- failed_nodes)), {:push_sum, 0, 0})
 
     lets_wait(&State.everyone_completed/0)
     end_time = System.monotonic_time(:millisecond)
