@@ -7,7 +7,7 @@ defmodule State do
 
   @spec init([]) :: {:ok, %{completed: [], initialized: [], no_more_neighbours: []}}
   def init([]) do
-    send(self(), {:print_state_length})
+    # send(self(), {:print_state_length})
     {:ok, %{initialized: [], completed: [], no_more_neighbours: []}}
   end
 
